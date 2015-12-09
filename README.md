@@ -3,7 +3,7 @@ What is it
 
 This tool is created to simplify the process of creating and deploying rails application.
 
-It generates 3 tools: 
+It generates 3 tools:
 
 - rails application itself (prepared by rails\_apps\_composer gem)
 - deploy project (capistrano 3 based)
@@ -13,7 +13,7 @@ It generates 3 tools:
 
 - devise with basic UI and sign in/sign up functonality
 - rubocop with [preconfigured config](https://github.com/Gera-IT/gerait_rubocop_config)
-- some other usefull tools. 
+- some other usefull tools.
 
 Note: All gems will be of last available version.
 
@@ -34,7 +34,7 @@ All packages will be installed from apt repos at latest version available there.
 See how it works
 ================
 
-[![Rails SDK](http://img.youtube.com/vi/yvJQa9T5_d0/0.jpg)](http://www.youtube.com/watch?v=yvJQa9T5_d0)
+[![Rails SDK](http://img.youtube.com/vi/yvJQa9T5_d0/0.jpg)](http://www.youtube.com/watch?v=y99vbWThyx8)
 
 Requirements
 ============
@@ -46,7 +46,7 @@ General:
 Required to run provisioning scripts:
 
 - [Ansible](http://docs.ansible.com/ansible/intro_installation.html)
-- rvm_io.rvm1-ruby ansible playbook `ansible-galaxy install rvm_io.rvm1-ruby` 
+- rvm_io.rvm1-ruby ansible playbook `ansible-galaxy install rvm_io.rvm1-ruby`
 - 'Blank'-state Ubuntu host with FQDN assigned
 
 Usage
