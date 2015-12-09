@@ -1,0 +1,33 @@
+---
+# file: roles/monit/tasks/configure.yml
+
+- name: be sure monit is configured
+  template:
+    src: monitrc.j2
+    dest: /etc/monit/monitrc
+    mode: 0600
+    owner: root
+    group: root
+  notify:
+    - reload monit
+  tags:
+    - monitoring
+    - monit
+
+- name: be sure monit common services configured
+  template:
+    src: "{{ item }}.j2"
+    dest: /etc/monit/conf.d/{{ item }}
+    mode: 0600
+    owner: root
+    group: root
+  with_items:
+    - sshd
+    - cron
+    - system
+    - filesystem
+  notify:
+    - reload monit
+  tags:
+    - monitoring
+    - monit

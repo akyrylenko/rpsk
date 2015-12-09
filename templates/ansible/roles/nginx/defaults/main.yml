@@ -1,0 +1,4 @@
+---
+# file: roles/nginx/defaults/main.yml
+nginx_processes: 1
+nginx_connection: 768

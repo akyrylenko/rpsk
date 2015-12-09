@@ -1,0 +1,14 @@
+set :stage, :staging
+
+role :app, '%STAGE_URL%'
+role :web, '%STAGE_URL%'
+role :db,  '%STAGE_URL%'
+
+set :rails_env, :staging
+set :rake, 'bundle exec rake'
+
+set :deploy_to, '/home/%PROJECT_NAME%/application'
+
+set :branch, ENV['BRANCH'] || 'develop'
+
+set :unicorn_config_path, "#{current_path}/config/unicorn.rb"

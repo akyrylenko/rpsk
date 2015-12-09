@@ -1,0 +1,18 @@
+---
+# file: roles/nginx/tasks/configure.yml
+- name: be sure nginx is configured
+  template:
+    src: nginx.conf.j2
+    dest: /etc/nginx/nginx.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart nginx
+
+- name: disable default site
+  file:
+    dest: /etc/nginx/sites-enabled/default
+    state: absent
+  notify:
+    - reload nginx

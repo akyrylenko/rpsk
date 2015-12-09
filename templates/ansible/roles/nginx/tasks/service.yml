@@ -1,0 +1,7 @@
+---
+# file: roles/nginx/tasks/service.yml
+- name: be sure nginx is running and enabled
+  service:
+    name: nginx
+    state: running
+    enabled: yes

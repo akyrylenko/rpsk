@@ -1,0 +1,5 @@
+---
+# file: roles/postgresql/tasks/main.yml
+- include: install.yml
+- include: service.yml
+- include: monit.yml

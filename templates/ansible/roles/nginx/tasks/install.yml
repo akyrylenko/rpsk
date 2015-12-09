@@ -1,0 +1,9 @@
+---
+# file: roles/nginx/tasks/install.yml
+- name: be sure nginx is installed
+  apt:
+    name: nginx
+    state: present
+    update_cache: yes
+  notify:
+    - restart nginx

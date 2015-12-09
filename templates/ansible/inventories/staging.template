@@ -1,0 +1,16 @@
+# file: staging
+
+[staging]
+%STAGE_ADDR%
+
+[web:children]
+staging
+
+[db:children]
+staging
+
+[app:children]
+staging
+
+[monitoring:children]
+staging

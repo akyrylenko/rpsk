@@ -1,0 +1,4 @@
+---
+# file: roles/munin/tasks/main.yml
+- include: install.yml
+- include: configure.yml

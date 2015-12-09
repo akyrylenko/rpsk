@@ -1,0 +1,22 @@
+---
+# file: roles/munin-node/tasks/install.yml
+- name: make sure prerequirements are installed
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - python-passlib
+    - libdbd-pg-perl
+  tags:
+    - monitoring
+    - munin
+
+- name: make sure munin-node is installed
+  apt:
+    name: munin-node
+    state: present
+    update_cache: yes
+  tags:
+    - monitoring
+    - munin

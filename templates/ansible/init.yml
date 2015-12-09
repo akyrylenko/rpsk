@@ -1,0 +1,9 @@
+---
+# file: init.yml
+- name: init all servers
+  hosts: all
+  gather_facts: no
+  sudo: yes
+  remote_user: "{{ initial_user }}"
+  roles:
+    - initial_setup

@@ -1,0 +1,19 @@
+---
+# file: roles/application/tasks/nginx.yml
+- name: be sure site is configured
+  sudo: yes
+  template:
+    src: site.j2
+    dest: /etc/nginx/sites-available/{{ app_name }}
+    owner: root
+    group: root
+    mode: 0644
+
+- name: enable site
+  sudo: yes
+  file:
+    src: /etc/nginx/sites-available/{{ app_name }}
+    dest: /etc/nginx/sites-enabled/{{ app_name }}
+    state: link
+  notify:
+    - reload nginx

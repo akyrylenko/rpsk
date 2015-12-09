@@ -1,0 +1,11 @@
+---
+# file: roles/postgresql/handlers/main.yml
+- name: restart postgresql
+  service:
+    name: postgresql
+    state: restarted
+
+- name: reload monit
+  service:
+    name: monit
+    state: reloaded

@@ -1,0 +1,11 @@
+---
+# file: roles/postgresql/tasks/service.yml
+- name: be sure postgresql is running and enabled
+  service:
+    name: postgresql
+    state: running
+    enabled: yes
+  tags:
+    - db
+    - postgresql
+    - services

@@ -1,0 +1,5 @@
+check process crond with pidfile /run/crond.pid
+  group system
+  start program = "service cron start"
+  stop  program = "service cron stop"
+  if 5 restarts with 5 cycles then timeout

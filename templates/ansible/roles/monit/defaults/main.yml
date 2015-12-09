@@ -1,0 +1,12 @@
+---
+# file: roles/monit/defaults/main.yml
+
+monit_user: admin
+monit_password: '123qweASD'
+file_system: /dev/sda1
+hostname: localhost
+mailserver_lines:
+  # - "{{ email_provider_address }} port {{ email_provider_port }}"
+  # - "username '{{ email_provider_username }}' password '{{ email_provider_password }}'"
+  # - "using tlsv1,"
+  - "localhost"

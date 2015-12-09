@@ -1,0 +1,54 @@
+---
+# file: roles/munin-node/tasks/install.yml
+
+- name: make sure postgresql plugins are linked
+  file:
+    src: /usr/share/munin/plugins/{{ item }}
+    dest: /etc/munin/plugins/{{ item }}
+    state: link
+  notify:
+    - restart munin-node
+  with_items:
+    - postgres_autovacuum
+    - postgres_bgwriter
+    - postgres_cache_
+    - postgres_checkpoints
+    - postgres_connections_
+    - postgres_connections_db
+    - postgres_locks_
+    - postgres_oldest_prepared_xact_
+    - postgres_prepared_xacts_
+    - postgres_querylength_
+    - postgres_scans_
+    - postgres_size_
+    - postgres_streaming_
+    - postgres_transactions_
+    - postgres_tuples_
+    - postgres_users
+    - postgres_xlog
+  tags:
+    - monitoring
+    - munin
+
+- name: make sure munin-node is configured
+  template:
+    src: munin-node.conf.j2
+    dest: /etc/munin/munin-node.conf
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart munin-node
+  tags:
+    - monitoring
+    - munin
+
+- name: make sure we have cron for munin
+  cron:
+    name: update munin info
+    minute: "*/5"
+    user: munin
+    job: /usr/bin/munin-cron
+  tags:
+    - monitoring
+    - munin

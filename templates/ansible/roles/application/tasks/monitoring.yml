@@ -1,0 +1,28 @@
+---
+# file: roles/application/tasks/monitoring.yml
+
+- name: make sure we have passwdfile for monit
+  sudo: yes
+  htpasswd:
+    path: /etc/nginx/monit_passwd
+    name: "{{ monit_user }}"
+    password: "{{ monit_password }}"
+    owner: root
+    group: www-data
+    mode: 0644
+  tags:
+    - monitoring
+    - monit
+
+- name: make sure we have passwdfile for munin
+  sudo: yes
+  htpasswd:
+    path: /etc/nginx/munin_passwd
+    name: "{{ munin_user }}"
+    password: "{{ munin_password }}"
+    owner: root
+    group: www-data
+    mode: 0644
+  tags:
+    - monitoring
+    - munin

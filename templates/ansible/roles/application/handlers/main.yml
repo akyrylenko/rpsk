@@ -1,0 +1,5 @@
+---
+# file: roles/application/handlers/main.yml
+- name: reload nginx
+  sudo: yes
+  command: service nginx reload

@@ -1,0 +1,10 @@
+---
+# file: roles/monit/tasks/install.yml
+
+- name: be sure monit is installed
+  apt:
+    name: monit
+    update_cache: yes
+  tags:
+    - monitoring
+    - monit

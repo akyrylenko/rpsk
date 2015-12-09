@@ -1,0 +1,6 @@
+---
+# file: roles/nginx/tasks/main.yml
+- include: install.yml
+- include: configure.yml
+- include: service.yml
+- include: monit.yml

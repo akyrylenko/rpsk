@@ -1,0 +1,44 @@
+Prepare application:
+====================
+
+$ ansible-galaxy install rvm_io.rvm1-ruby
+
+Edit ./inventories/staging (usually just [staging] section)
+
+Edit ./group_vars/all.yml. Important values:
+
+- deployer_user
+- app_name
+
+
+Edit ./group_vars/staging.yml. Important values:
+
+- initial_user - the one who initiates setup (ubuntu for AWS, root for Linode, etc.)
+- public_keys - users whos keys will be added to deployer's ssh_authorized
+- hostname
+- rails_environment
+- database_pass - generate something strong and random enough
+- admin_password - ^^^
+- monit_password - ^^^
+- secret_key_base - see below
+- devise_secret_key - see below
+- monit_file_system - main file system attach point (check with `df` command)
+
+
+Useful code for keys generator:
+
+s = (0..9).to_a + ('a'..'z').to_a + ('A'..'Z').to_a
+16.times.map { s.sample }.join
+
+s = (0..9).to_a + ('a'..'f').to_a
+128.times.map { s.sample }.join
+
+
+Install application:
+====================
+
+Make initial setup (user, keys)
+> ./init.sh
+
+Setup site
+> ./site.sh

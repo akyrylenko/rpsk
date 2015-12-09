@@ -1,0 +1,3 @@
+---
+# file: roles/hostname/defaults/main.yml
+hostname: localhost

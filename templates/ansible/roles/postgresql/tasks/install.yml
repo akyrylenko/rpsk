@@ -1,0 +1,26 @@
+---
+# file: roles/postgresql/postgresql/install.yml
+- name: be sure postgresql dependencies are installed
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - python-psycopg2
+    - postgresql-server-dev-9.3
+    - python-pycurl
+    - libpq-dev
+
+- name: be sure postgresql server is installed
+  apt:
+    name: postgresql
+    state: present
+    update_cache: yes
+  notify:
+    - restart postgresql
+
+- name: be sure postgresql client is installed
+  apt:
+    name: postgresql-client
+    state: present
+    update_cache: yes

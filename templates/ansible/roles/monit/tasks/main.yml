@@ -1,0 +1,5 @@
+---
+# file: roles/monit/tasks/mail.yml
+
+- include: install.yml
+- include: configure.yml

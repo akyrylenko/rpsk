@@ -1,0 +1,21 @@
+---
+- name: "try to SSH as deployer"
+  sudo: no
+  ignore_errors: yes
+  local_action: command ssh -o PasswordAuthentication=no {{ deployer_user }}@{{ inventory_hostname }}
+  register: ssh_deployer_response
+  failed_when: ssh_deployer_response.stderr.find('Permission denied') != -1
+  changed_when: no
+
+- name: create user
+  when: ssh_deployer_response|failed
+  user:
+    name: "{{ deployer_user }}"
+    shell: /bin/bash
+
+- name: add ssh keys
+  when: ssh_deployer_response|failed
+  authorized_key:
+    user: "{{ deployer_user }}"
+    key: "{{ item.key }}"
+  with_items: deployer_public_keys

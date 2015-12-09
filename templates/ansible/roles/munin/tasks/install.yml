@@ -1,0 +1,10 @@
+---
+# file: roles/munin/tasks/install.yml
+- name: make sure munin is installed
+  apt:
+    name: munin
+    state: present
+    update_cache: yes
+  tags:
+    - monitoring
+    - munin

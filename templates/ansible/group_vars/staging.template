@@ -1,0 +1,81 @@
+initial_user: %INITIAL_USER%
+
+provisioner_user: chef
+provisioner_public_keys:
+  - user: chef
+    key: "%PUBKEY%"
+
+# common
+deployer_user: %STAGE_USER%
+app_name: %PROJECT_NAME%
+hostname: "%STAGE_ADDR%"
+nginx_port: 80
+
+# app
+rails_environment: staging
+
+# db
+database_pool: 5
+database_host: localhost
+database_name: "{{ app_name }}_{{ rails_environment }}"
+database_user: "{{ app_name }}"
+database_pass: "{{ app_name }}"
+
+# initial
+deployer_public_keys:
+  - user: "{{ deployer_user }}"
+    key: "%PUBKEY%"
+
+rvm1_user:  "{{ deployer_user }}"
+rvm1_install_flags: '--auto-dotfiles --user-install'
+rvm1_install_path: '/home/{{ deployer_user }}/.rvm'
+rvm1_autolib_mode: 0
+rvm1_rubies:
+  - %RUBY_VERSION%
+
+app_ruby_env: "{{ rvm1_rubies[0] }}@{{ app_name}}-app"
+
+# secrets
+admin_name: "admin"
+admin_email: "{{ admin_name }}@{{ hostname }}"
+admin_password: "123qweASD"
+domain_name: 'your-domain.com'
+email_provider_address: 'email_provider_address'
+email_provider_authentication: 'emain_provider_authenti'
+email_provider_username: 'email_provider_username'
+email_provider_password: 'email_provider_password'
+email_provider_port: 'email_provider_port'
+secret_key_base: 'replace_with_your_key'
+devise_secret_key: "replace_with_your_key"
+devise_mailer_sender: "no-reply@{{ hostname }}"
+mailer_default_from: "Gera staging <noreply@gera-it.net>"
+
+#email smtp settings - configure with your account
+smtp_address: ""
+smtp_port: 25
+smtp_domain: your-domain.com
+smtp_authentication: login
+smtp_enable_starttls_auto: true
+smtp_user_name: ''
+smtp_password: ''
+smtp_openssl_verify_mode: 'none'
+
+# unicorn
+unicord_workers: 1
+
+# monit
+monit_user: admin
+monit_password: 'ChangeMeASAP'
+monit_alert_emails:
+  - admin@example.com
+monit_from_email: noreply@gera-it.net
+monit_port: 2812
+
+# munin
+munin_user: "{{ monit_user }}"
+munin_password: "{{ monit_password }}"
+munin_nodes:
+  - hostname: "{{ hostname }}"
+    ip: "{{ inventory_hostname }}"
+munin_server: "^127\\.0\\.0\\.1$"
+munin_port: 4949

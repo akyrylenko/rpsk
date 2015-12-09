@@ -1,0 +1,9 @@
+---
+# file: site.yml
+
+- include: allservers.yml
+- include: webservers.yml
+- include: dbservers.yml
+- include: deployer_user.yml
+- include: appservers.yml
+- include: monitoring.yml

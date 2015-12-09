@@ -1,0 +1,16 @@
+---
+# file: roles/nginx/handlers/main.yml
+- name: reload nginx
+  service:
+    name: nginx
+    state: reloaded
+
+- name: restart nginx
+  service:
+    name: nginx
+    state: restarted
+
+- name: reload monit
+  service:
+    name: monit
+    state: reloaded

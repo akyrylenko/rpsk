@@ -1,0 +1,6 @@
+check process sshd with pidfile /run/sshd.pid
+  group system
+  start program "service ssh start"
+  stop program "service ssh stop"
+  if failed port 22 protocol ssh then restart
+  if 5 restarts within 5 cycles then timeout

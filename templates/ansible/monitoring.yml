@@ -1,0 +1,8 @@
+---
+# file: monitoring.yml
+- name: prepare monitoring server
+  hosts: monitoring
+  remote_user: "{{ provisioner_user }}"
+  sudo: yes
+  roles:
+    - munin

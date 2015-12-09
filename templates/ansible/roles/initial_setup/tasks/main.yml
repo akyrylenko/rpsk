@@ -1,0 +1,42 @@
+---
+- name: "try to SSH as provisioner"
+  sudo: no
+  ignore_errors: yes
+  local_action: command ssh -o PasswordAuthentication=no {{ provisioner_user }}@{{ inventory_hostname }}
+  register: ssh_provisioner_response
+  failed_when: ssh_provisioner_response.stderr.find('Permission denied') != -1
+  changed_when: no
+
+- name: create user
+  when: ssh_provisioner_response|failed
+  user:
+    name: "{{ provisioner_user }}"
+    groups: sudo
+    shell: /bin/bash
+
+- name: add user as sudoer
+  when: ssh_provisioner_response|failed
+  lineinfile:
+    dest: /etc/sudoers
+    line: "{{ provisioner_user }} ALL=(ALL) NOPASSWD:ALL"
+    state: present
+    insertafter: "^%sudo"
+    regexp: "^{{ provisioner_user }} ALL"
+
+- name: add ssh keys
+  when: ssh_provisioner_response|failed
+  authorized_key:
+    user: "{{ provisioner_user }}"
+    key: "{{ item.key }}"
+  with_items: provisioner_public_keys
+
+- name: setup sshd
+  when: ssh_provisioner_response|failed
+  copy:
+    src: sshd_config
+    dest: /etc/ssh/sshd_config
+    owner: root
+    group: root
+    mode: 0644
+  notify:
+    - restart ssh

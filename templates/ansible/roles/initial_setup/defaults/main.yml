@@ -1,0 +1,7 @@
+---
+# file: roles/initial_setup/vars/main.yml
+
+initial_user: root
+public_keys:
+  - user: lunich
+    key: "ssh-rsa AAAAB3NzaC1yc2EAAAABIwAAAQEA2jRMZRd5UHJF1vuBWVLyui3SzKsjKzwB/lA6GDrqbc4vOcSgoT0UNBdi8r4Q1fa4yaLUyxX2oLkN0iBd9bYvj+3cS1YguGFsnduKiuFAGD6nmf2oN9GxdGY8gDNcilsrsTAhZks8FA32oyB1M2x3MhgRlyRV+MSQpjLyG7aAHb+MG8r55Bdd9FUGuu90+p+Gi+SsUvYZ9SjKzjVYHvNIEDSSd7i1WC3bQ206khuRjDsIacGXO9YDX4VFB8t6DkoSWnJnakEu3IaZI7lnIvwN3HAKu6/iBX4rUvAXUR8E+dwWKQ6278t39ez8uZSZt+80oSZseYo9iCvmy4ew8mMXNQ== dima.lunich@gmail.com"

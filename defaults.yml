@@ -1,0 +1,66 @@
+recipes:
+- git
+- setup
+- readme
+- gems
+- tests
+- email
+- devise
+- roles
+- frontend
+- pages
+- init
+- extras
+- email_dev
+- code_metrics
+- reset_smtp_settings
+- staging_env 
+- gerait_rubocop_config
+
+
+gems:
+- kaminari
+
+args:
+  :skip_test_unit: yes
+  :skip_active_record: no
+  :skip_spring: yes
+
+prefs:
+  # setup
+  :dev_webserver: thin
+  :prod_webserver: unicorn
+  :database: postgresql
+  :templates: erb
+  :tests: rspec
+  :continuous_testing: guard
+  :frontend: bootstrap3
+  :email: smtp
+  :authentication: devise
+  :devise_modules: default
+  :authorization: roles
+  :dashboard: none
+  :form_builder: simple_form
+  :pages: about+users
+  # gems
+  :pg_username: '' # it will create new $PROJECT_NAME user 
+  :pg_host: localhost
+  :drop_database: true
+  # extras
+  :ban_spiders: true
+  :github: false
+  :local_env_file: foreman
+  :quiet_assets: true
+  :better_errors: true
+  :pry: true
+  :rubocop: true
+  :disable_turbolinks: true
+  # email_dev
+  :mailcatcher: true
+  :mail_view: false
+  :analytics: none
+  # railsapps
+  :announcements: none
+  :apps4: none
+  # code metrics
+  :code_metrics: simplecov

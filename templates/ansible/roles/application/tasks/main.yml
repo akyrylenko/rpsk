@@ -1,0 +1,7 @@
+---
+# file: roles/application/tasks/main.yml
+
+- include: directories.yml
+- include: nginx.yml
+- include: database.yml
+- include: monitoring.yml
