@@ -1,6 +1,8 @@
 What is it
 ==========
 
+**_RPSK_ = rails project starter kit**
+
 This tool is created to simplify the process of creating and deploying rails application.
 
 It generates 3 tools:
