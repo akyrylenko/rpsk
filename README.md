@@ -7,7 +7,7 @@ This tool is created to simplify the process of creating and deploying rails app
 
 It generates 3 tools:
 
-- rails application itself (prepared by rails\_apps\_composer gem)
+- rails application itself (prepared by [rails\_apps\_composer](https://github.com/RailsApps/rails_apps_composer))
 - deploy project (capistrano 3 based)
 - provisioning project (ansible-based).
 
