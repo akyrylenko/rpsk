@@ -88,100 +88,152 @@ OptionParser.new do |parser|
 ##  end
 end.parse!
 
-jenkins_api_client_options = {server_url: jenkins_options[:jenkins_url]}
-jenkins_api_client_options.merge!(username: jenkins_options[:jenkins_user_id]) unless jenkins_options[:jenkins_user_id].nil? || jenkins_options[:jenkins_user_id].empty?
-jenkins_api_client_options.merge!(password: jenkins_options[:jenkins_api_token]) unless jenkins_options[:jenkins_api_token].nil? || jenkins_options[:jenkins_api_token].empty?
-@client = JenkinsApi::Client.new(jenkins_api_client_options)
+module JenkinsJobSetup
+  class Creator
+    def initialize(options={})
+      @options = options
+    end
 
-if jenkins_options[:project_name].nil?
-  jobs = @client.job.list("^" + jenkins_options[:default_project_name])
-  #jobs = @client.job.list_all
-  jenkins_options[:project_name] = [jenkins_options[:default_project_name], jobs.count].join('-')
-end
+    def process
+      self.connect
+      self.prepare_project_name
+      self.create_jobs
+    end
 
-prepare_git_settings_sh = <<-SETUP_GIT_SETTINGS
+    def connect
+      jenkins_api_client_options = {server_url: @options[:jenkins_url]}
+      jenkins_api_client_options.merge!(username: @options[:jenkins_user_id]) unless @options[:jenkins_user_id].nil? || @options[:jenkins_user_id].empty?
+      jenkins_api_client_options.merge!(password: @options[:jenkins_api_token]) unless @options[:jenkins_api_token].nil? || @options[:jenkins_api_token].empty?
+      @client = JenkinsApi::Client.new(jenkins_api_client_options)
+    end
 
-SETUP_GIT_SETTINGS
+    def prepare_project_name
+      if @options[:project_name].nil?
+        jobs = @client.job.list("^" + @options[:default_project_name])
+        #jobs = @client.job.list_all
+        @options[:project_name] = [@options[:default_project_name], jobs.count].join('-')
+      end
+    end
 
-sh_header = <<-SHELL_HEADER
-#!/bin/bash
+    def prepare_git_settings_sh
+      <<-SETUP_GIT_SETTINGS
 
-SHELL_HEADER
-prepare_ruby_gemset = <<-RUBY_GEM_SET_SH
-source ~/.bash_profile
-#{prepare_git_settings_sh}
-rvm install #{jenkins_options[:ruby_version]}
-rvm use #{jenkins_options[:ruby_version]}@#{jenkins_options[:ruby_gemset]} --create
-gem install bundler --no-ri --no-rdoc
-bundle install --quiet
-RUBY_GEM_SET_SH
-clear_logs = "rm -rf log/*"
-setup_application = <<-SETUP_APPLICATION_SH
-cp config/deploy/ci/*.yml config/
-bundle exec rake db:create
-bundle exec rake db:migrate
-bundle exec rake test:prepare
-rm -rf public/assets/ && jammit
-SETUP_APPLICATION_SH
+      SETUP_GIT_SETTINGS
+    end
 
-rails_best_practices = <<-RAILS_BEST_PRACTICES_SH
-RAILS_ENV=test COVERAGE=on bundle exec rake ci:setup:rspecdoc spec
-bundle exec rails_best_practices --silent -f html --with-github #{jenkins_options[:githut_path]} . || true
-RAILS_BEST_PRACTICES_SH
+    def sh_header
+      "#!/bin/bash" + <<-SHELL_HEADER
 
-brakeman_commands = <<-BRAKEMAN_SH
-gem install brakeman --no-ri --no-rdoc
-bundle exec brakeman -q . -o brakeman-report.html
-bundle exec brakeman -q -o brakeman-output.tabs --no-progress --separate-models
-BRAKEMAN_SH
-gemsurance_command = <<-GEMSURANCE_SH
-bundle exec gemsurance
-GEMSURANCE_SH
+      SHELL_HEADER
+    end
 
-rubocop_command = <<-RUBOCOP_SH
-bundle exec rubocop --require rubocop/formatter/checkstyle_formatter --format RuboCop::Formatter::CheckstyleFormatter --no-color --rails --out tmp/rubocop_checkstyle.xml -c rubocop.yml || true
-RUBOCOP_SH
-start_commands = [
-  sh_header,
-  prepare_ruby_gemset,
-  clear_logs,
-  setup_application,
-]
+    def prepare_ruby_gemset
+      <<-RUBY_GEM_SET_SH
+        source ~/.bash_profile
+        #{prepare_git_settings_sh}
+        rvm install #{@options[:ruby_version]}
+        rvm use #{@options[:ruby_version]}@#{@options[:ruby_gemset]} --create
+        gem install bundler --no-ri --no-rdoc
+        bundle install --quiet
+      RUBY_GEM_SET_SH
+    end
 
-shell_commands = {
-  gemsurance: [gemsurance_command],
-  rails_best_practices: [rails_best_practices],
-  brakeman: [brakeman_commands],
-  rubocop: [rubocop_command],
-}
+    def clear_logs
+      "rm -rf log/*"
+    end
 
+    def setup_application
+      <<-SETUP_APPLICATION_SH
+        cp config/deploy/ci/*.yml config/
+        bundle exec rake db:create
+        bundle exec rake db:migrate
+        bundle exec rake test:prepare
+        rm -rf public/assets/ && jammit
+      SETUP_APPLICATION_SH
+    end
 
-job_template_name = '-JOB-NAME-'
-job_descriptions = {
-  gemsurance: ['Gemsurance report', "#{jenkins_options[:jenkins_url]}/job/#{job_template_name}/ws/gemsurance_report.html"],
-  rails_best_practices: ['Rails Best Practices report', "#{jenkins_options[:jenkins_url]}/job/#{job_template_name}/ws/rails_best_practices_output.html"],
-  brakeman: ['Brakeman report', "#{jenkins_options[:jenkins_url]}/job/#{job_template_name}/ws/brakeman-report.html"],
-  rubocop: ['Rubocop analisys'],
-}
+    def rails_best_practices
+      <<-RAILS_BEST_PRACTICES_SH
+        RAILS_ENV=test COVERAGE=on bundle exec rake ci:setup:rspecdoc spec
+        bundle exec rails_best_practices --silent -f html --with-github #{@options[:githut_path]} . || true
+      RAILS_BEST_PRACTICES_SH
+    end
 
+    def brakeman_commands
+      <<-BRAKEMAN_SH
+        gem install brakeman --no-ri --no-rdoc
+        bundle exec brakeman -q . -o brakeman-report.html
+        bundle exec brakeman -q -o brakeman-output.tabs --no-progress --separate-models
+      BRAKEMAN_SH
+    end
 
-shell_commands.each_pair do |_job_name, shell_command|
-  job_name = [jenkins_options[:project_name], _job_name].join('-')
+    def gemsurance_command
+      <<-GEMSURANCE_SH
+        bundle exec gemsurance
+      GEMSURANCE_SH
+    end
 
-  job_description = job_descriptions[_job_name.to_sym].join("\n").split('//').join('/').split(job_template_name).join(job_name)
-  _shell_commands = (start_commands + shell_command).join("\n")
+    def rubocop_command
+      <<-RUBOCOP_SH
+        bundle exec rubocop --require rubocop/formatter/checkstyle_formatter --format RuboCop::Formatter::CheckstyleFormatter --no-color --rails --out tmp/rubocop_checkstyle.xml -c rubocop.yml || true
+      RUBOCOP_SH
+    end
 
-  _options = {
-    "NEW_JOB_NAME" => job_name,
-    "NEW_JOB_DESCRIPTION" => job_description,
-    "NEW_JOB_GITHUB_URL" => jenkins_options[:github_url],
-    "NEW_JOB_SHELL_COMMANDS1" => _shell_commands,
-  }
+    def start_commands
+      [
+        sh_header,
+        prepare_ruby_gemset,
+        clear_logs,
+        setup_application,
+      ]
+    end
 
-  job_code = @client.job.build("BuildRailsShellJobFromAPI", _options)
-  unless job_code == '201'
-    raise "Could not build the job specified" 
-  else
-    puts "Build job #{job_name}"
+    def shell_commands
+      {
+        gemsurance: [gemsurance_command],
+        rails_best_practices: [rails_best_practices],
+        brakeman: [brakeman_commands],
+        rubocop: [rubocop_command],
+      }
+    end
+
+    def job_template_name
+      '-JOB-NAME-'
+    end
+
+    def job_descriptions
+      {
+        gemsurance: ['Gemsurance report', "#{@options[:jenkins_url]}/job/#{job_template_name}/ws/gemsurance_report.html"],
+        rails_best_practices: ['Rails Best Practices report', "#{@options[:jenkins_url]}/job/#{job_template_name}/ws/rails_best_practices_output.html"],
+        brakeman: ['Brakeman report', "#{@options[:jenkins_url]}/job/#{job_template_name}/ws/brakeman-report.html"],
+        rubocop: ['Rubocop analisys'],
+      }
+    end
+
+    def create_jobs
+      shell_commands.each_pair do |_job_name, shell_command|
+        job_name = [@options[:project_name], _job_name].join('-')
+
+        job_description = job_descriptions[_job_name.to_sym].join("\n").split('//').join('/').split(job_template_name).join(job_name)
+        _shell_commands = (start_commands + shell_command).join("\n")
+
+        _options = {
+          "NEW_JOB_NAME" => job_name,
+          "NEW_JOB_DESCRIPTION" => job_description,
+          "NEW_JOB_GITHUB_URL" => @options[:github_url],
+          "NEW_JOB_SHELL_COMMANDS1" => _shell_commands,
+        }
+
+        job_code = @client.job.build("BuildRailsShellJobFromAPI", _options)
+        unless job_code == '201'
+          raise "Could not build the job specified" 
+        else
+          puts "Build job #{job_name}"
+        end
+      end
+    end
   end
 end
+
+jenkins_job_set_creator = JenkinsJobSetup::Creator.new(jenkins_options)
+jenkins_job_set_creator.process
