@@ -1,0 +1,52 @@
+Jenkins allow to manage it throught the Jenkins REST API.
+It is usefull to do it by using gem jenkins_api_client that wrap requests into method calls. 
+
+Run 
+gem install jenkins_api_client
+
+or add to the Gemfile
+jenkins_api_client
+
+and run
+bundle install
+
+After that you can create jenkins client object and use it for accessing jenkins API. User is allowed to connect to Jenkins with anonymous access and to the server with username/password authentication. If user uses github.com as OAuth provider to sign in to the Jenkins it is required to create username and set password in the jenkins profile "Configure" page. It is available from the dropdown menu on the Username link in the top left corner of the jenkins page. Look on the "Credentials / Username with password" section of the Jenkins User Profile page.
+After updating credentaials  you'll got available settings "User ID" and "API Token".
+If it is not shown press "Show API Token..." button.
+These values should be used for the authentication. If no username is provided Client has anonymous access, else you need to provide username together with password or password_base64
+
+@client = JenkinsApi::Client.new({
+  'server_url' => 'http://jenkins-server.com/',
+  'username' => 'ausername', # User ID
+  'password' => 'abcdef01234567890123456789abcdef', # API Token
+  })
+
+To create client you can use parameters:
+- server_url,
+- server_ip,
+- server_port,
+- proxy_ip,
+- proxy_port,
+- jenkins_path,
+- username,
+- password,
+- password_base64,
+- logger,
+- log_location,
+- log_level,
+- timeout,
+- http_open_timeout,
+- http_read_timeout,
+- ssl,
+- follow_redirects,
+- identity_file,
+- cookies.
+
+
+After creating jenkins api client (sign-in to api) user can get list of job. This is the easiest way to check that access to API is granted with provided credentials.
+
+# The following call will return all jobs matching 'SomeJob' substring
+puts @client.job.list("^SomeJob")
+
+# The following call lists all jobs
+puts @client.job.list_all

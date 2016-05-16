@@ -1,0 +1,2 @@
+Sign In to Jenkins
+From the Jenkins main page, select either the "New Job" or "Create new Jobs" link.

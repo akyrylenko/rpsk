@@ -1,0 +1,21 @@
+Many RubyOnRails projects have requirements to have jobs for the same reports build in continuos integration system. To create such things in Jenkins it is usefull to use Jenkins DSL Plugin. It allows you to specify what kind of job you need to have and just provide it with parameters during build.
+
+
+
+To start using Jenkins Job DSL Plugin you need to installed it.
+Than you'll should create job with and add a build step to execute the Job DSL script.
+
+
+To have adjustable builds it is usefull to use parameters passed into the job.
+To enable using parameters set checkbox "This build is parameterized".
+
+Than let's add String parameter with name NEW_JOB_NAME
+
+In shell script it can be accessible with $ prefix. E.g.
+
+env
+echo the value of bar is $NEW_JOB_NAME
+
+
+Wiki documentation page for plugin
+https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin

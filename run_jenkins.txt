@@ -1,0 +1,59 @@
+What is it
+==========
+
+**_JENKINS_CMD_ = tool for setup jenkins jobs for your rails application**
+
+
+It generates several jobs in jenkins:
+
+- ...
+
+**** includes:
+
+- 
+- 
+- 
+
+See how it works
+================
+
+[![Rails SDK](http://img.youtube.com/vi/yvJQa9T5_d0/0.jpg)](http://www.youtube.com/watch?v=y99vbWThyx8)
+
+Requirements
+============
+
+General:
+
+- [RVM](http://rvm.io/)
+
+Required to run provisioning scripts:
+
+- [Ansible](http://docs.ansible.com/ansible/intro_installation.html)
+- rvm_io.rvm1-ruby ansible playbook `ansible-galaxy install rvm_io.rvm1-ruby`
+- 'Blank'-state Ubuntu host with FQDN assigned
+
+Usage
+=====
+
+To generate a new application it's necessary to simply run `./jenkins_cmd.sh`
+
+You will be asked to enter:
+
+1. `project name` - Just a name for you project
+2. `ruby version` - No need to explain
+3. `ruby gemset` - No need to explain
+4. `git repository url` - url of the .git file of your repository
+5. `jenkins url` - url of the ci server 
+6. `user id and user token` - credentials to authenticate user on the CI server to process initial setup of the generated jenkins jobs. User is allowed to connect to Jenkins with anonymous access and to the server with username/password authentication. If user uses github.com as OAuth provider to sign in to the Jenkins it is required to create username and set password in the jenkins profile "Configure" page. It is available from the dropdown menu on the Username link in the top left corner of the jenkins page. Look on the "Credentials / Username with password" section of the Jenkins User Profile page. After updating credentaials  you'll got available settings "User ID" and "API Token". If it is not shown press "Show API Token..." button. These values should be used for the authentication. If no username is provided script will use anonymous access, else you need to provide username together with password or password_base64.
+7. `user fullname and email for github identifiing in jenkins run` - full name and email of the  user who will be in charge of getting application on jenkins host. By default it is anonymous Jenkins User. You can leave that value.
+
+After generation is completed, review `group_vars/staging.yml` file from `provisioning` directory and change default passwords
+
+To provision staging host, from `provisioning` directory, run `./initial.sh` to prepare staging host for provisioning, then `./provision.sh` to perform provisioning.
+
+The last one, you need to deploy your application using capistrano project. After deployment it will be running at `http://staging-host-FQDN/`
+
+Tips
+====
+
+- 
