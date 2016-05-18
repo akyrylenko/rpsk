@@ -148,8 +148,14 @@ module JenkinsJobSetup
         bundle exec rake db:create
         bundle exec rake db:migrate
         bundle exec rake test:prepare
-        rm -rf public/assets/ && jammit
       SETUP_APPLICATION_SH
+    end
+
+    def regenerate_assets
+      <<-GENERATE_ASSETS
+        rm -rf public/assets/
+        jammit
+      GENERATE_ASSETS
     end
 
     def rails_best_practices
