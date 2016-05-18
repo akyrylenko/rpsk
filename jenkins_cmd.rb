@@ -147,7 +147,7 @@ module JenkinsJobSetup
         cp config/deploy/ci/*.yml config/
         bundle exec rake db:create
         bundle exec rake db:migrate
-        bundle exec rake test:prepare
+        bundle exec rake db:test:prepare
       SETUP_APPLICATION_SH
     end
 
