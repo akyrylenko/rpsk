@@ -37,8 +37,8 @@ RUBY_VERSION=${RUBY_VERSION:-2.2.2}
 
 printf "Please provide ruby gemset you are using in your project application.\n"
 printf "To have Jenkins job run correctly you may need to open generated job Configure page, goto Build Environment section. And set checkbox ""Run the build in a RVM-managed environment"". Also it will require to set ruby version@gemset in the Implementation variable below the checkbox.\n"
-read -p "Ruby gemset [rpsk]: " RUBY_GEMSET
-RUBY_GEMSET=${RUBY_GEMSET:-rpsk}
+read -p "Ruby gemset [myapp]: " RUBY_GEMSET
+RUBY_GEMSET=${RUBY_GEMSET:-myapp}
 printf "Please use ""$RUBY_VERSION@$RUBY_GEMSET"" for the Implementation variable below the checkbox.\n"
 
 DEFAULT_REPO_URL="git@github.com:some_github_user/$PROJECT_NAME.git"
@@ -108,8 +108,9 @@ USER_EMAIL=${USER_EMAIL:-$DEFAULT_USER_EMAIL}
 # #######################
 #
 
-rvm install $RUBY_VERSION
-rvm use ruby-$RUBY_VERSION@$RUBY_GEMSET --ruby-version --create
+# We are providing .ruby-version and .ruby-gemset file to set rpsk scripts environment. So 2 lines below are not required
+#rvm install $RUBY_VERSION
+#rvm use ruby-$RUBY_VERSION@$RUBY_GEMSET --ruby-version --create
 
 printf "Installing jenkins_api_client...\n"
 gem install jenkins_api_client --no-ri --no-rdoc
