@@ -217,6 +217,7 @@ module JenkinsJobSetup
     end
 
     def create_jobs
+      build_jobs_names = []
       shell_commands.each_pair do |_job_name, shell_command|
         job_name = [@options[:project_name], _job_name].join('-')
 
@@ -234,9 +235,10 @@ module JenkinsJobSetup
         unless job_code == '201'
           raise "Could not build the job specified" 
         else
-          puts "Build job #{job_name}"
+          build_jobs_names << job_name
         end
       end
+      puts "Build #{build_jobs_names.size} jobs on @options[:jenkins_url]:\n#{build_jobs_names.map{|j| "- #{j}"}.join(";\n")}.\n"
     end
   end
 end
