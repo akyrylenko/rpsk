@@ -238,7 +238,7 @@ module JenkinsJobSetup
           build_jobs_names << job_name
         end
       end
-      puts "Build #{build_jobs_names.size} jobs on @options[:jenkins_url]:\n#{build_jobs_names.map{|j| "- #{j}"}.join(";\n")}.\n"
+      puts "Build #{build_jobs_names.size} jobs on #{@options[:jenkins_url]}:\n#{build_jobs_names.map{|j| "- #{j}"}.join(";\n")}.\n"
     end
   end
 end
