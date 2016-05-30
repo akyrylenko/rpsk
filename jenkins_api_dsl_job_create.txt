@@ -1,2 +1,20 @@
-Sign In to Jenkins
+
+Jenkins has large set of plugins. You can write your own plugin but in most cases it is possible to find existing plugin that covers your needs. E.g. for automatical script working with jenkins you can use DSL scripts by running jobs together with "Job DSL" plugin.
+Sign In to Jenkins. To "Job DSL" Plugin 
 From the Jenkins main page, select either the "New Job" or "Create new Jobs" link.
+
+Now we can create Job for generating project and tool dependent jobs. For this You'll need to have configured Freestyle Job named as "CreateJobWithDSL" in your jenkins.
+In the section "Build" of the CreateJobWithDSL job you should check "Use provided DSL script" checkbox and also fill textarea field "DSL Script value" with next script:
+__________________________________________________________________________________________________
+def newJenkinsDSLJob = job("NewDSLJob"){
+  description("This job is created by Job DSL plugin")
+  scm {
+    git("git@github.com:akyrylenko/testgenerator.git")
+  }
+  triggers {
+    scm('*/5 * * * *')
+  }
+}
+__________________________________________________________________________________________________
+
+This script will setup job "NewDSLJob" with description "This job is created by Job DSL plugin" for pulling code from GitHub repository "git@github.com:akyrylenko/testgenerator.git" using source control management every 5 minutes.

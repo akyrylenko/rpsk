@@ -1,0 +1,100 @@
+Video scenario:
+
+Here is sample of automatical setup for Rails application Jenkins Jobs.
+We'll see how to setup jenkins and generate jobs for rails application.
+
+ Goto browser.
+
+ Open http://jenkins.local:8080
+
+ Open Dashboard / Manage Plugins / (Installed/Available).
+
+First you need to setup your Jenkins Plugins - install required plugins if they were not installed earlier. We'll use:
+- "Job DSL" plugin for generating Jenkins Jobs by running.
+and several plugins required for for running jobs for rails application on jenkins:
+- "Git" plugin
+- "GitHub" plugin
+- "Hudson Ruby" plugin
+- "Rake" plugin
+- "RVM" plugin
+
+ You'll need to have configured "BuildRailsShellJobFromAPI" Freestyle Job in your jenkins.
+It should be parameterized job with string parameters:
+- NEW_JOB_NAME
+- NEW_JOB_GITHUB_URL
+- NEW_JOB_SHELL_COMMANDS1
+- NEW_JOB_DESCRIPTION
+Build section should have checked "Use provided DSL script" with DSL Script value:
+__________________________________________________________________________________________________
+def newJenkinsDSLJob = job("${NEW_JOB_NAME}"){
+  description("${NEW_JOB_DESCRIPTION}")
+  scm {
+    git("${NEW_JOB_GITHUB_URL}")
+  }
+  triggers {
+    scm('*/5 * * * *')
+  }
+  steps {
+    shell("${NEW_JOB_SHELL_COMMANDS1}")
+  }
+}
+__________________________________________________________________________________________________
+
+Goto console.
+
+Clone git repository git@github.com:akyrylenko/rpsk.git
+
+Install gems:
+ - bundler
+ - jenkins_api_client
+
+Run:
+
+ ./jenkins_cmd.sh
+
+ Enter requested values or use defaults.
+ E.g. project name "test-1"
+
+ Script finished ok.
+
+ Goto browser.
+
+ Open http://jenkins.local:8080
+
+ Open Dashboard.
+ Check that there are 4 new jobs created for project "test-1":
+ - test-1-brakeman
+ - test-1-gemsurance
+ - test-1-rails_best_practices
+ - test-1-rubocop
+
+To have runned Jobs correctly you'll need to.
+
+Create config/deploy/ci/database.yml configuration file so jenkins will use it during runnins application. Please contact with your jenkins host admin to get right credentials for access DB.
+
+Check if you have required gems added to the Gemfile. You can put them into the development and test group block:
+ - gem 'gemsurance'
+ - gem 'brakeman', :require => false
+ - gem 'rails_best_practices'
+ - gem 'rspec-rails', '2.14'
+ - gem 'ci_reporter_rspec', '~> 1.0.0'
+ - gem 'rubocop-checkstyle_formatter', require: false
+ - gem 'rubocop'
+
+Also for running ci reporter it could be required to update your Rakefile to include tasks
+1. please put this line before load_tasks line
+__________________________________________________________________________________________________
+require('ci/reporter/rake/rspec') if (ENV['RAILS_ENV']=='test' || ENV['RAILS_ENV']=='development')
+__________________________________________________________________________________________________
+
+2. And next lines after the load_tasks sentense
+__________________________________________________________________________________________________
+if (ENV['RAILS_ENV']=='test' || ENV['RAILS_ENV']=='development')
+  task :rspec => 'ci:setup:rspec'
+end
+__________________________________________________________________________________________________
+
+It is also will be useful to add path "spec/reports/" to .gitignore file
+
+
+

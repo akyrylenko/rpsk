@@ -1,13 +1,48 @@
 Many RubyOnRails projects have requirements to have jobs for the same reports build in continuos integration system. To create such things in Jenkins it is usefull to use Jenkins DSL Plugin. It allows you to specify what kind of job you need to have and just provide it with parameters during build.
 
-
-
 To start using Jenkins Job DSL Plugin you need to installed it.
-Than you'll should create job with and add a build step to execute the Job DSL script.
+In Jenkins WebUI go to "Manage Plugins", open tab "Available" and choose to install "Job DSL" plugin.
 
+Than you'll should create job with and add a build step to execute the Job DSL script.
+This could be Freestyle job.
+In the section "Build" subsection "Process Job DSLs" you'll need to check the radiobutton with text "Use the provided DSL script". Than you'll need to write DSL script for your requirements.
+
+E.g. for create new Job in Jenkins you can use the script below:
+
+job("New-DSL-Job"){
+  description("This is sample for the DSL job")
+  scm {
+    git("git@github.com:akyrylenko/testgenerator.git")
+  }
+  triggers {
+    scm('*/5 * * * *')
+  }
+  steps {
+    shell("# some commands")
+  }
+}
+
+This will create "New-DSL-Job" job that will poll source control management system every 5 minutes. In our case it will check for updates repository on the GitHub.com. In case of existed new commits in the repository it will run shell sommands specified in the shell method of steps block.
+
+Method "job" result can be put into the variable and add some additional configuration or run methods for it like an method object. E.g.:
+
+def newJenkinsDSLJob = job("NEW_JOB_NAME"){
+}
+newJenkinsDSLJob.description("NEW_JOB_DESCRIPTION")
 
 To have adjustable builds it is usefull to use parameters passed into the job.
-To enable using parameters set checkbox "This build is parameterized".
+To enable using parameters on the General tab set checkbox "This project is parameterized". After that you'll be able to "Add Parameter" of next types:
+- String Parameter
+- Boolean Parameter
+- CVS Symbolic Name Parameter
+- Choice Parameter
+- Credentials Parameter
+- File Parameter
+- List Subversion tags (and more)
+- Multi-line String Parameter
+Password Parameter
+Run Parameter
+String Parameter
 
 Than let's add String parameter with name NEW_JOB_NAME
 
@@ -15,7 +50,6 @@ In shell script it can be accessible with $ prefix. E.g.
 
 env
 echo the value of bar is $NEW_JOB_NAME
-
 
 Wiki documentation page for plugin
 https://wiki.jenkins-ci.org/display/JENKINS/Job+DSL+Plugin

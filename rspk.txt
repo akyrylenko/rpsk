@@ -1,0 +1,113 @@
+
+Using CI can makes your development more comfortable, clear and solid. E.g. you can have setuped script for analising your code. You can get info about running test on you changes before deploying them, or even deploy automaticaly after successful build. You can get info about conditions and style of your code, so you can make it more supportable and readable. Also it can be useful to get info about gems sets used in project. CI can do this checks after pushing your changes to repository automaticaly so should not take care about running them manualy.
+In RSPK we've prepared script for setup 4 jenkins jobs for the project:
+ - brakeman (analize app using static analysis security vulnerability scanner for Ruby on Rails applications http://brakemanscanner.org/)
+ - gemsurance (setup job for runing tool for monitoring your Gems' vulnerabilities and version status https://github.com/appfolio/gemsurance )
+ - rails_best_practices (setup job for running tests, prepare reports and process their resultsa using group code metric tool  https://github.com/railsbp/rails_best_practices)
+ - rubocop (run Ruby static code analyzer, based on the community Ruby style guide. http://rubocop.readthedocs.io)
+
+To proceed with setup this jobs on your jenkins first you need to check if Jenkins has all required settings set. 
+
+* Prepare Jenkins Settings
+* Run RSPK Jenkins console script
+* Make changes to new jenkins jobs in WebUI
+* Update your rails application configuration
+
+
+* Prepare Jenkins Settings *
+Open you jenkins WebUI in browser. If you are using local jenkins than you'll probably open URL http://jenkins.local:8080.
+Please check that your signed user has Administrators rights.
+
+First we are checking that all required plugins installed. Open Dashboard / Manage Plugins / (Installed/Available).
+
+First you need to setup your Jenkins Plugins - install required plugins if they were not installed earlier. We'll require one plugin for creating jobs and several plugins required for for running jobs for rails application on jenkins. Let's check that we have installed:
+- "Job DSL" (plugin for generating Jenkins Jobs by running parameterized DSL script with settings for our application and tools scripts)
+and several :
+- "Git" plugin (Allows to access git repository)
+- "GitHub" plugin
+- "Hudson Ruby" plugin
+- "Rake" plugin
+- "RVM" plugin
+
+Now we can create Job for generating project and tool dependent jobs. For this You'll need to have configured Freestyle Job named as "BuildRailsShellJobFromAPI" in your jenkins.
+This Job should be parameterized with prepared 4 string parameters:
+- NEW_JOB_NAME
+- NEW_JOB_GITHUB_URL
+- NEW_JOB_SHELL_COMMANDS1
+- NEW_JOB_DESCRIPTION
+In the section "Build" of the BuildRailsShellJobFromAPI job you should check "Use provided DSL script" checkbox and also fill textarea field "DSL Script value" with next script:
+__________________________________________________________________________________________________
+def newJenkinsDSLJob = job("${NEW_JOB_NAME}"){
+  description("${NEW_JOB_DESCRIPTION}")
+  scm {
+    git("${NEW_JOB_GITHUB_URL}")
+  }
+  triggers {
+    scm('*/5 * * * *')
+  }
+  steps {
+    shell("${NEW_JOB_SHELL_COMMANDS1}")
+  }
+}
+__________________________________________________________________________________________________
+
+If you've done with this than we can go to terminal
+* Run RSPK Jenkins console script *
+
+Clone git repository git@github.com:akyrylenko/rpsk.git
+
+Install gems:
+ - bundler
+ - jenkins_api_client
+
+Run:
+
+ ./jenkins_cmd.sh
+
+ Enter requested values or use defaults.
+ E.g. project name "test-1"
+
+ Script finished ok.
+
+* Make changes to new jenkins jobs in WebUI * 
+
+Goto browser.
+
+ Open http://jenkins.local:8080
+
+ Open Dashboard.
+ Check that there are 4 new jobs created for project "test-1":
+ - test-1-brakeman
+ - test-1-gemsurance
+ - test-1-rails_best_practices
+ - test-1-rubocop
+
+* Update your rails application configuration *
+
+To have runned Jobs correctly you'll need to.
+
+Create config/deploy/ci/database.yml configuration file so jenkins will use it during runnins application. Please contact with your jenkins host admin to get right credentials for access DB.
+
+Check if you have required gems added to the Gemfile. You can put them into the development and test group block:
+ - gem 'gemsurance'
+ - gem 'brakeman', :require => false
+ - gem 'rails_best_practices'
+ - gem 'rspec-rails', '2.14'
+ - gem 'ci_reporter_rspec', '~> 1.0.0'
+ - gem 'rubocop-checkstyle_formatter', require: false
+ - gem 'rubocop'
+
+Also for running ci reporter it could be required to update your Rakefile to include tasks
+1. please put this line before load_tasks line
+__________________________________________________________________________________________________
+require('ci/reporter/rake/rspec') if (ENV['RAILS_ENV']=='test' || ENV['RAILS_ENV']=='development')
+__________________________________________________________________________________________________
+
+2. And next lines after the load_tasks sentense
+__________________________________________________________________________________________________
+if (ENV['RAILS_ENV']=='test' || ENV['RAILS_ENV']=='development')
+  task :rspec => 'ci:setup:rspec'
+end
+__________________________________________________________________________________________________
+
+It is also will be useful to add path "spec/reports/" to .gitignore file
