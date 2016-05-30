@@ -1,4 +1,6 @@
 
+* *
++
 Using CI can makes your development more comfortable, clear and solid. E.g. you can have setuped script for analising your code. You can get info about running test on you changes before deploying them, or even deploy automaticaly after successful build. You can get info about conditions and style of your code, so you can make it more supportable and readable. Also it can be useful to get info about gems sets used in project. CI can do this checks after pushing your changes to repository automaticaly so should not take care about running them manualy.
 In RSPK we've prepared script for setup 4 jenkins jobs for the project:
  - brakeman (analize app using static analysis security vulnerability scanner for Ruby on Rails applications http://brakemanscanner.org/)
@@ -15,12 +17,12 @@ To proceed with setup this jobs on your jenkins first you need to check if Jenki
 
 
 * Prepare Jenkins Settings *
+============================
+
 Open you jenkins WebUI in browser. If you are using local jenkins than you'll probably open URL http://jenkins.local:8080.
 Please check that your signed user has Administrators rights.
 
-First we are checking that all required plugins installed. Open Dashboard / Manage Plugins / (Installed/Available).
-
-First you need to setup your Jenkins Plugins - install required plugins if they were not installed earlier. We'll require one plugin for creating jobs and several plugins required for for running jobs for rails application on jenkins. Let's check that we have installed:
+You need to setup your Jenkins Plugins - install required plugins if they were not installed earlier. Open Dashboard / Manage Plugins / (Installed/Available). We'll require one plugin for creating jobs and several plugins required for for running jobs for rails application on jenkins. Let's check that we have installed:
 - "Job DSL" (plugin for generating Jenkins Jobs by running parameterized DSL script with settings for our application and tools scripts)
 and several :
 - "Git" plugin (Allows to access git repository)
@@ -51,40 +53,58 @@ def newJenkinsDSLJob = job("${NEW_JOB_NAME}"){
 }
 __________________________________________________________________________________________________
 
-If you've done with this than we can go to terminal
+If you've done with this than we can go to terminal and complete next step.
+
 * Run RSPK Jenkins console script *
+===================================
 
-Clone git repository git@github.com:akyrylenko/rpsk.git
+Clone git repository git@github.com:akyrylenko/rpsk.git and go to the folder of RPSK tool.
+$ git clone git@github.com:akyrylenko/rpsk.git
+$ cd rpsk
 
-Install gems:
- - bundler
- - jenkins_api_client
+Install bundler gem:
 
-Run:
+$ gem install bundler
 
- ./jenkins_cmd.sh
+Than  you can run script for generating jenkins jobs for your project:
 
- Enter requested values or use defaults.
- E.g. project name "test-1"
+$ ./jenkins.sh
 
- Script finished ok.
+Enter requested values or use defaults.
+You will be asked to enter:
+
+1. `project name` - Just a name for you project
+2. `ruby version` - No need to explain
+3. `ruby gemset` - No need to explain
+4. `git repository url` - url of the .git file of your repository
+5. `git repository path` - path will be taken from the `git repository url`, but script will ask you to confim it.
+5. `jenkins url` - url of the ci server 
+6. `user id and user token` - credentials to authenticate user on the CI server to process initial setup of the generated jenkins jobs. User is allowed to connect to Jenkins with anonymous access and to the server with username/password authentication. If user uses github.com as OAuth provider to sign in to the Jenkins it is required to create username and set password in the jenkins profile "Configure" page. It is available from the dropdown menu on the Username link in the top left corner of the jenkins page. Look on the "Credentials / Username with password" section of the Jenkins User Profile page. After updating credentaials  you'll got available settings "User ID" and "API Token". If it is not shown press "Show API Token..." button. These values should be used for the authentication. If no username is provided script will use anonymous access, else you need to provide username together with password or password_base64. If you are using local jenkins than you'll probably not need to enter credentials.
+7. `user fullname and email for github identifiing in jenkins run` - full name and email of the  user who will be in charge of getting application on jenkins host. By default it is anonymous Jenkins User. You can leave that value because script will not push changes to the repository.
+
+After that script will process creation jobs on jenkins. After script finished ok you can check and finish setup of these jobs.
 
 * Make changes to new jenkins jobs in WebUI * 
+=============================================
 
-Goto browser.
+Goto browser. Open your jenkins (e.g. http://jenkins.local:8080)
 
- Open http://jenkins.local:8080
-
- Open Dashboard.
+ Open Dashboard page.
  Check that there are 4 new jobs created for project "test-1":
  - test-1-brakeman
  - test-1-gemsurance
  - test-1-rails_best_practices
  - test-1-rubocop
 
-* Update your rails application configuration *
+To have runned Jobs correctly you'll need to update jobs configuration in th Jenkins WebUI. You need to choose job, than open Configure page.
+- Working with Git. You can leave current configuration of polling repository by SCM (Source Control Management) or you can enable using Github triggers.
+ For this you should go on the "Source Code Management" to the "Build Triggers" section and check the "Build when a change is pushed to GitHub" checkbox.
+- Using RVM when running job. You need to check in "Build Environment" section checkbox "Run the build in a RVM-managed environment". AFter that you'll be able to enter required ruby version vs ruby gemset to the "Implementation" field (e.g. "ruby-2.2.2@test-1").
 
-To have runned Jobs correctly you'll need to.
+Please repeat review/update these settings for all four jobs created for your application.
+
+* Update your rails application configuration *
+===============================================
 
 Create config/deploy/ci/database.yml configuration file so jenkins will use it during runnins application. Please contact with your jenkins host admin to get right credentials for access DB.
 
