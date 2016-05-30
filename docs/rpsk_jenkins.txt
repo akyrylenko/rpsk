@@ -1,6 +1,6 @@
 
-* *
-+
+* Using Jenkins with RPSK *
+
 Using CI can makes your development more comfortable, clear and solid. E.g. you can have setuped script for analising your code. You can get info about running test on you changes before deploying them, or even deploy automaticaly after successful build. You can get info about conditions and style of your code, so you can make it more supportable and readable. Also it can be useful to get info about gems sets used in project. CI can do this checks after pushing your changes to repository automaticaly so should not take care about running them manualy.
 In RSPK we've prepared script for setup 4 jenkins jobs for the project:
  - brakeman (analize app using static analysis security vulnerability scanner for Ruby on Rails applications http://brakemanscanner.org/)
