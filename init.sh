@@ -215,10 +215,10 @@ else
 fi
 
 printf "Installing rails...\n"
-gem install rails --no-ri --no-rdoc
+gem install rails -v=4.2.6 --no-ri --no-rdoc
 
 printf "Installing rails_apps_composer...\n"
-gem install rails_apps_composer
+gem install rails_apps_composer --no-ri --no-rdoc
 
 if [[ -f $CURRENT_PATH/defaults.yml ]] ; then
   rails_apps_composer new . \
@@ -242,21 +242,22 @@ fi
 
 # Jenkins config file copying
 cd $AP_DIR
-mkdir config/deploy
-mkdir config/deploy/ci
-cp config/database.yml config/deploy/ci/database.yml
+mkdir "$AP_DIR/config/deploy"
+mkdir "$AP_DIR/config/deploy/ci"
+cp "$AP_DIR/config/database.yml" "$AP_DIR/config/deploy/ci/database.yml"
 
 # Update Rakefile for ci tasks
 sed '6 i\
 if (ENV['RAILS_ENV']=='test' || ENV['RAILS_ENV']=='development') \
   task :rspec => 'ci:setup:rspec' \
 end \
-' Rakefile > Rakefile.tmp1
+' "$AP_DIR/Rakefile" > "$AP_DIR/Rakefile.tmp1"
 sed '4 i\
 require('ci/reporter/rake/rspec') if (ENV['RAILS_ENV']=='test' || ENV['RAILS_ENV']=='development') \
 ' Rakefile.tmp1 > Rakefile.tmp2
-cp Rakefile.tmp2 Rakefile
-rm Rakefile.tmp*
+cp "$AP_DIR/Rakefile.tmp2" "$AP_DIR/Rakefile"
+rm "$AP_DIR/Rakefile.tmp*"
+printf "\n"
 cat Rakefile
 
 git remote add origin $REPO_URL
