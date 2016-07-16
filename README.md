@@ -37,6 +37,7 @@ See how it works
 ================
 
 [![Rails SDK](http://img.youtube.com/vi/yvJQa9T5_d0/0.jpg)](http://www.youtube.com/watch?v=y99vbWThyx8)
+[![Rails SDK - Jenkins Jobs Setup](https://i.ytimg.com/vi/wIOxa2wGMcU/1.jpg)](https://youtu.be/wIOxa2wGMcU)
 
 Requirements
 ============
