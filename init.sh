@@ -240,6 +240,25 @@ fi
 #   --quiet \
 #   --verbose
 
+# Jenkins config file copying
+cd $AP_DIR
+mkdir config/deploy
+mkdir config/deploy/ci
+cp config/database.yml config/deploy/ci/database.yml
+
+# Update Rakefile for ci tasks
+sed '6 i\
+if (ENV['RAILS_ENV']=='test' || ENV['RAILS_ENV']=='development') \
+  task :rspec => 'ci:setup:rspec' \
+end \
+' Rakefile > Rakefile.tmp1
+sed '4 i\
+require('ci/reporter/rake/rspec') if (ENV['RAILS_ENV']=='test' || ENV['RAILS_ENV']=='development') \
+' Rakefile.tmp1 > Rakefile.tmp2
+cp Rakefile.tmp2 Rakefile
+rm Rakefile.tmp*
+cat Rakefile
+
 git remote add origin $REPO_URL
 git push -u origin master
 
@@ -254,3 +273,5 @@ gem install jenkins_api_client --no-ri --no-rdoc
 # Script that should be run from rpsk project folder
 
 ruby ./jenkins_cmd.rb --project-name $PROJECT_NAME --jenkins-url $JENKINS_URL --jenkins-user-id $JENKINS_USER_ID --jenkins-api-token $JENKINS_API_TOKEN --ruby-version $RUBY_VERSION --ruby-gemset $RUBY_GEMSET --github-url $REPO_URL --github-path $GITHUB_PATH --user-fullname $USER_FULLNAME --user-email $USER_EMAIL
+printf "\n"
+printf "Note: Please make sure you have config/deploy/ci/database.yml configuration file so jenkins will use it during runnins application. Please contact with your jenkins host admin to get right credentials for access DB. \n"
